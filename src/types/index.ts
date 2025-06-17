@@ -6,6 +6,7 @@ export interface Product {
   price: number;
   description: string | null;
   category: {
+    description: any;
     id: number;
     title: string;
   };

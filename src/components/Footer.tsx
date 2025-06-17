@@ -25,8 +25,8 @@ const Footer = () => {
                     {/* Coluna de E-mails */}
                     <div>
                         <h3 className="text-white font-bold uppercase mb-4">E-mails</h3>
-                        <a href="mailto:informacoes@hmrow.com.br" className="block text-sm hover:text-white">info@coposdemetal.com</a>
-                        <a href="mailto:pedidos@hmrow.com.br" className="block text-sm hover:text-white">pedido@coposdemetal.com</a>
+                        <a href="mailto:informacoes@hmrow.com.br" className="block text-sm hover:text-white">info@rocknmetal.com</a>
+                        <a href="mailto:pedidos@hmrow.com.br" className="block text-sm hover:text-white">pedido@rocknmetal.com</a>
                     </div>
 
                     {/* Coluna Institucional (Exemplo) */}

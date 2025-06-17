@@ -1,0 +1,184 @@
+"use client";
+
+import React, { useEffect, useState, useCallback } from 'react';
+import Image from 'next/image';
+import { Product } from '@/types';
+import { notFound, useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
+import Cookies from 'js-cookie';
+import Link from 'next/link';
+import { Loader2, ShoppingCart } from 'lucide-react';
+
+// -------------------------------------------------------------------------- #
+//                                TIPOS DE DADOS                              #
+// -------------------------------------------------------------------------- #
+
+interface ProductDetailPageProps {
+    params: { id: string };
+}
+
+// -------------------------------------------------------------------------- #
+//                             COMPONENTE DA PÁGINA                           #
+// -------------------------------------------------------------------------- #
+
+export default function ProductDetailPage({ params }: ProductDetailPageProps) {
+    // --- ESTADOS DO COMPONENTE ---
+    const [product, setProduct] = useState<Product | null>(null);
+    const [loading, setLoading] = useState(true);
+    // Estado específico para o botão "Adicionar", para feedback visual
+    const [isAdding, setIsAdding] = useState(false);
+
+    // --- HOOKS ---
+    const { user } = useAuth();
+    const router = useRouter();
+
+    // --- FUNÇÃO DE BUSCA DE DADOS ---
+    const fetchProduct = useCallback(async () => {
+        setLoading(true);
+        try {
+            const res = await fetch(`http://localhost:8000/products/${params.id}`);
+            if (res.status === 404) {
+                notFound();
+                return;
+            }
+            if (!res.ok) throw new Error('Falha ao buscar dados do produto');
+            const data = await res.json();
+            setProduct(data);
+        } catch (error) {
+            console.error("Erro na API ao buscar produto:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [params.id]);
+
+    useEffect(() => {
+        fetchProduct();
+    }, [fetchProduct]);
+
+
+    // --- MANIPULADOR DE EVENTOS ---
+    const handleAddToCart = async () => {
+        if (!user) {
+            router.push('/login');
+            return;
+        }
+        if (!product) return;
+
+        setIsAdding(true); 
+        try {
+            const token = Cookies.get('access_token');
+            if (!token) {
+                alert("Sua sessão expirou. Por favor, faça o login novamente.");
+                router.push('/login');
+                return;
+            }
+
+            const response = await fetch('http://localhost:8000/cart/items/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ product_id: product.id, quantity: 1 })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || "Falha ao adicionar ao carrinho");
+            }
+            alert(`'${product.name}' foi adicionado ao carrinho!`);
+        } catch (error) {
+            console.error(error);
+            alert("Ocorreu um erro ao adicionar o produto ao carrinho.");
+        } finally {
+            setIsAdding(false); 
+        }
+    };
+
+    // --- LÓGICA DE RENDERIZAÇÃO ---
+    if (loading) {
+        return (
+            <div className="flex h-screen items-center justify-center">
+                <Loader2 className="h-10 w-10 animate-spin text-gray-500" />
+            </div>
+        );
+    }
+
+    if (!product) {
+        return (
+            <div className="flex h-screen flex-col items-center justify-center text-center">
+                <h1 className="text-2xl font-bold">Produto não encontrado</h1>
+                <Link href="/" className="mt-4 text-teal-600 hover:underline">Voltar para a loja</Link>
+            </div>
+        );
+    }
+
+    return (
+        <div className="bg-white">
+            <div className="container mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16">
+
+                    <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-gray-100">
+                        {product.image_url ? (
+                            <Image
+                                src={product.image_url}
+                                alt={product.name}
+                                fill
+                                className="object-cover object-center"
+                                sizes="(max-width: 768px) 100vw, 50vw"
+                            />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                                <span className="text-gray-400">Sem Imagem</span>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="flex flex-col py-4">
+                        <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-gray-900">{product.name}</h1>
+
+                        <div className="mt-4">
+                            <p className="text-3xl text-gray-800">R$ {product.price.toFixed(2).replace('.', ',')}</p>
+                        </div>
+
+                        {product.description && (
+                            <div className="mt-8">
+                                <h3 className="text-base font-semibold text-gray-900">Descrição</h3>
+                                <div className="mt-2 text-base text-gray-600 space-y-4">
+                                    <p>{product.description}</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {product.category && (
+                            <div className="mt-8 pt-6 border-t border-gray-200">
+                                <h3 className="text-base font-semibold text-gray-900">Categoria</h3>
+                                <div className="mt-2">
+                                    <Link href={`/category/${product.category.id}`} className="text-base text-teal-600 hover:text-teal-800 font-semibold">
+                                        {product.category.title}
+                                    </Link>
+                                    {product.category.description && (
+                                        <p className="mt-1 text-sm text-gray-500">{product.category.description}</p>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="mt-10">
+                            <button
+                                onClick={handleAddToCart}
+                                disabled={isAdding} 
+                                className="flex w-full max-w-xs items-center justify-center rounded-md border border-transparent bg-black px-8 py-3 text-base font-medium text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:bg-gray-400"
+                            >
+                                {isAdding ? (
+                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                ) : (
+                                    <ShoppingCart className="mr-2 h-5 w-5" />
+                                )}
+                                {isAdding ? 'Adicionando...' : 'Adicionar ao Carrinho'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
