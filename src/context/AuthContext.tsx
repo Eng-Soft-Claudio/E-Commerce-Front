@@ -24,7 +24,7 @@ export interface User {
   address_zip: string;
   address_city: string;
   address_state: string;
-  orders: any[]; 
+  orders: any[];
 }
 
 export interface CartItem {
@@ -33,12 +33,20 @@ export interface CartItem {
   product: Product;
 }
 
+// CORREÇÃO: Adicionando a tipagem para o cupom e incluindo-o na interface do Carrinho.
+export interface Coupon {
+  id: number;
+  code: string;
+  discount_percent: number;
+}
+
 export interface Cart {
   id: number;
   items: CartItem[];
   subtotal: number;
   discount_amount: number;
   final_price: number;
+  coupon: Coupon | null; // <-- Propriedade adicionada!
 }
 
 interface AuthContextType {
@@ -47,7 +55,7 @@ interface AuthContextType {
   loading: boolean;
   error: string | null;
   fetchCart: () => Promise<void>;
-  fetchUser: () => Promise<void>; 
+  fetchUser: () => Promise<void>;
   login: (formData: FormData) => Promise<void>;
   logout: () => void;
   register: (userData: RegisterData) => Promise<void>;
@@ -136,7 +144,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       Cookies.set('access_token', data.access_token, { expires: 1, secure: process.env.NODE_ENV === 'production' });
 
-      setUser(userData); 
+      setUser(userData);
 
       router.push(userData.is_superuser ? '/admin/dashboard' : '/');
     } catch (err: any) {

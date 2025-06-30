@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Menu, ShoppingCart, User as UserIcon, LogOut } from 'lucide-react';
 import MobileMenu from './MobileMenu';
 import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation'; // Adicionado para redirecionamento do logout
 
 // -------------------------------------------------------------------------- #
 //                          COMPONENTE DO CABEÇALHO                          #
@@ -13,8 +14,18 @@ import { useAuth } from '@/context/AuthContext';
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, logout, cart } = useAuth();
+  const router = useRouter();
 
-  const cartTotal = user && !user.is_superuser && cart ? cart.total_price : 0;
+  // CORREÇÃO:
+  // 1. Usar o 'final_price' que já considera descontos.
+  // 2. Garantir que, se o carrinho for nulo ou o usuário for admin, o valor seja 0.
+  const cartValue = (user && !user.is_superuser && cart) ? cart.final_price : 0;
+
+  // CORREÇÃO: Envolver logout em uma função que também redireciona
+  const handleLogout = () => {
+    logout();
+    router.push('/');
+  }
 
   return (
     <>
@@ -27,27 +38,24 @@ const Header = () => {
                 <Menu className="h-6 w-6" />
               </button>
             </div>
-            
+
             <div className="text-xl md:text-3xl font-bold">
-              <Link href="/" className="hover:text-gray-400">E-Commerce</Link>
+              <Link href="/" className="hover:text-gray-400">Louva-Deus</Link>
             </div>
 
+            {/* Este campo de pesquisa pode ser implementado no futuro */}
             <div className="hidden lg:block lg:w-1/3">
-              <input 
-                type="text" 
-                placeholder="Pesquisar produtos..."
-                className="w-full bg-gray-800 border border-gray-600 rounded-md py-2 px-4 focus:outline-none focus:border-red-500"
-              />
+              {/* <input type="text" placeholder="Pesquisar produtos..." ... /> */}
             </div>
-            
+
             <div className="flex items-center space-x-4">
               {user ? (
                 <>
-                  <Link href="/minha-conta" className="flex items-center space-x-2 hover:text-red-500">
+                  <Link href={user.is_superuser ? "/admin/dashboard" : "/minha-conta"} className="flex items-center space-x-2 hover:text-red-500">
                     <UserIcon className="h-5 w-5" />
-                    <span className="hidden md:inline">Olá, {user.email.split('@')[0]}</span>
+                    <span className="hidden md:inline">Olá, {user.full_name.split(' ')[0]}</span>
                   </Link>
-                  <button onClick={logout} className="flex items-center space-x-2 hover:text-red-500" aria-label="Sair">
+                  <button onClick={handleLogout} className="flex items-center space-x-2 hover:text-red-500" aria-label="Sair">
                     <LogOut className="h-5 w-5" />
                   </button>
                 </>
@@ -57,25 +65,20 @@ const Header = () => {
                   <span className="hidden md:inline">Entrar</span>
                 </Link>
               )}
-              
+
               <div className="h-6 w-px bg-gray-600"></div>
 
               <Link href="/cart" className="flex items-center space-x-2 hover:text-red-500">
                 <ShoppingCart className="h-5 w-5" />
-                <span>{`R$${cartTotal.toFixed(2).replace('.', ',')}`}</span>
+                {/* Usa a variável corrigida e segura `cartValue` */}
+                <span>{`R$${cartValue.toFixed(2).replace('.', ',')}`}</span>
               </Link>
+
             </div>
           </div>
-          
-          {/* BARRA DE NAVEGAÇÃO RESTAURADA */}
-          <nav className="hidden lg:flex justify-center space-x-6 py-2 border-t border-gray-700">
-            <Link href="/noticias" className="hover:text-red-500 uppercase font-medium">Notícias</Link>
-            <Link href="/loja" className="hover:text-red-500 uppercase font-medium">Loja</Link>
-            <Link href="/em-oferta" className="text-red-600 hover:text-red-500 uppercase font-medium">Em Oferta</Link>
-          </nav>
         </div>
       </header>
-      
+
       <MobileMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
     </>
   );
