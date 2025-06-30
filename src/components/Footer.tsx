@@ -58,7 +58,7 @@ const Footer = () => {
             {/* Barra de Copyright */}
             <div className="bg-gray-900 py-4">
                 <div className="container mx-auto px-4 text-center text-xs">
-                    <p>© 2025 - Louva-Deus | CNPJ: 12.345.678/0001-99</p>
+                    <p>© 2025 - E-Commerce | CNPJ: XX.YYY.XXX/YYYY-XX</p>
                 </div>
             </div>
         </footer>
