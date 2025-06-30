@@ -17,8 +17,12 @@ import Autoplay from "embla-carousel-autoplay";
 
 const HeroCarousel = () => {
     const banners = [
-        { id: 1, src: 'https://res.cloudinary.com/cloud-drone/image/upload/v1750125695/copos-de-metal_us4wni.jpg', alt: 'Copos Térmicos' },
-        { id: 2, src: 'https://res.cloudinary.com/cloud-drone/image/upload/v1750125853/bandas_wwaozs.jpg', alt: 'Bandas' },
+        { id: 1, src: 'https://res.cloudinary.com/cloud-drone/image/upload/v1751242011/banner1_sxlchy.png', alt: 'Banner image' },
+        { id: 2, src: 'https://res.cloudinary.com/cloud-drone/image/upload/v1751242011/banner2_i1frnk.png', alt: 'Banner image' },
+        { id: 3, src: 'https://res.cloudinary.com/cloud-drone/image/upload/v1751242011/banner3_ysp2kw.png', alt: 'Banner image' },
+        { id: 4, src: 'https://res.cloudinary.com/cloud-drone/image/upload/v1751242011/banner4_k0njzh.png', alt: 'Banner image' },
+
+    
     ];
 
     return (

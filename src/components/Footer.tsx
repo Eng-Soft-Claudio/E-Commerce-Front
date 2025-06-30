@@ -10,23 +10,25 @@ const Footer = () => {
                     {/* Coluna de Endereço */}
                     <div>
                         <h3 className="text-white font-bold uppercase mb-4">Endereço</h3>
-                        <p className="text-sm">Avenida do Metal</p>
-                        <p className="text-sm">nº 666 - Centro do Cú</p>
-                        <p className="text-sm">Cidade do Rock</p>
+                        <p className="text-sm">Rua</p>
+                        <p className="text-sm">Número e Bairro</p>
+                        <p className="text-sm">Cidade</p>
+                        <p className="text-sm">Estado</p>
+                        <p className="text-sm">CEP</p>
                     </div>
 
                     {/* Coluna de Telefones */}
                     <div>
                         <h3 className="text-white font-bold uppercase mb-4">Telefones</h3>
-                        <p className="text-sm">(19) 3666-9874</p>
-                        <p className="text-sm">(19) 3666-1234</p>
+                        <p className="text-sm">(xx) xxxx-xxxx</p>
+                        <p className="text-sm">(yy) yyyy-yyyy</p>
                     </div>
 
                     {/* Coluna de E-mails */}
                     <div>
                         <h3 className="text-white font-bold uppercase mb-4">E-mails</h3>
-                        <a href="mailto:informacoes@hmrow.com.br" className="block text-sm hover:text-white">info@rocknmetal.com</a>
-                        <a href="mailto:pedidos@hmrow.com.br" className="block text-sm hover:text-white">pedido@rocknmetal.com</a>
+                        <a href="mailto:informacoes@hmrow.com.br" className="block text-sm hover:text-white">info@email.com</a>
+                        <a href="mailto:pedidos@hmrow.com.br" className="block text-sm hover:text-white">pedido@email.com</a>
                     </div>
 
                     {/* Coluna Institucional (Exemplo) */}
@@ -56,7 +58,7 @@ const Footer = () => {
             {/* Barra de Copyright */}
             <div className="bg-gray-900 py-4">
                 <div className="container mx-auto px-4 text-center text-xs">
-                    <p>© 2025 - Rock N' Metal | CNPJ: 12.345.678/0001-99</p>
+                    <p>© 2025 - Louva-Deus | CNPJ: 12.345.678/0001-99</p>
                 </div>
             </div>
         </footer>
