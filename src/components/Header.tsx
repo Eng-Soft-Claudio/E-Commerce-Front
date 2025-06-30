@@ -40,7 +40,7 @@ const Header = () => {
             </div>
 
             <div className="text-xl md:text-3xl font-bold">
-              <Link href="/" className="hover:text-gray-400">Louva-Deus</Link>
+              <Link href="/" className="hover:text-gray-400">E-Commerce</Link>
             </div>
 
             {/* Este campo de pesquisa pode ser implementado no futuro */}

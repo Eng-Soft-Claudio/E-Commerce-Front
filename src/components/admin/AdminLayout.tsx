@@ -1,10 +1,10 @@
 "use client";
 
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect } from 'react'; 
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { LayoutDashboard, Box, ShoppingBag, Users, FolderKanban } from 'lucide-react'; // Adicionado ícone para Categoria
+import { LayoutDashboard, Box, ShoppingBag, Users, FolderKanban } from 'lucide-react';
 
 // -------------------------------------------------------------------------- #
 //                            TIPAGEM DO COMPONENTE                          #
@@ -17,32 +17,26 @@ interface AdminLayoutProps {
 //                          COMPONENTE DE LAYOUT ADMIN                         #
 // -------------------------------------------------------------------------- #
 const AdminLayout = ({ children }: AdminLayoutProps) => {
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth(); 
   const router = useRouter();
 
-  // --- LÓGICA DE PROTEÇÃO DA ROTA ---
-  if (loading) {
-    return <div className="flex h-screen items-center justify-center">Carregando...</div>;
-  }
+  useEffect(() => {
+    if (!loading) {
+      if (!user || !user.is_superuser) {
+        
+        router.push('/login');
+      }
+    }
+  }, [user, loading, router]);
 
-  if (!user) {
-    if (typeof window !== 'undefined') router.push('/login');
-    return <div className="flex h-screen items-center justify-center">Redirecionando para login...</div>;
-  }
-  
-  if (!user.is_superuser) {
+  if (loading || !user || !user.is_superuser) {
     return (
-      <div className="flex h-screen items-center justify-center text-center">
-        <div>
-          <h1 className="text-2xl font-bold text-red-600">Acesso Negado</h1>
-          <p className="mt-2">Você não tem permissão para acessar esta área.</p>
-          <Link href="/" className="mt-4 inline-block text-teal-600 hover:underline">Voltar para a loja</Link>
-        </div>
+      <div className="flex h-screen items-center justify-center">
+        Carregando ou redirecionando...
       </div>
     );
   }
 
-  // --- RENDERIZAÇÃO DO LAYOUT PARA ADMINS AUTORIZADOS ---
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Menu Lateral Fixo */}
@@ -67,7 +61,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
             <ShoppingBag className="mr-3 h-5 w-5" />
             Pedidos
           </Link>
-           <Link href="/admin/users" className="flex items-center px-4 py-2 rounded-lg hover:bg-gray-700">
+          <Link href="/admin/users" className="flex items-center px-4 py-2 rounded-lg hover:bg-gray-700">
             <Users className="mr-3 h-5 w-5" />
             Usuários
           </Link>
@@ -76,11 +70,14 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
 
       {/* Conteúdo Principal */}
       <div className="flex-grow flex flex-col">
-        <header className="bg-white shadow-md p-4 flex justify-end items-center">
-            <span className="text-gray-700">Bem-vindo, {user.email}</span>
-            {/* Poderíamos adicionar um botão de logout do admin aqui no futuro */}
+        <header className="bg-white shadow-md p-4 flex justify-between items-center">
+          <div /> {/* Elemento vazio para empurrar o resto para a direita */}
+          <div>
+            <span className="text-gray-700 mr-4">Bem-vindo, {user.full_name}</span>
+            <Button variant="outline" size="sm" onClick={logout}>Sair</Button>
+          </div>
         </header>
-        
+
         <main className="flex-grow p-6 md:p-8">
           {children}
         </main>
@@ -88,5 +85,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     </div>
   );
 };
+
+import { Button } from '../ui/button';
 
 export default AdminLayout;
