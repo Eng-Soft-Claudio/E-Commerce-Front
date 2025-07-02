@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image'; 
+import Image from 'next/image';
 
 // -------------------------------------------------------------------------- #
 //                                TIPOS DE DADOS                              #
@@ -20,12 +20,13 @@ interface FeaturedCategoriesProps {
 //                   MAPEAMENTO DE IMAGENS PARA CATEGORIAS                     #
 // -------------------------------------------------------------------------- #
 const imageUrlMap: { [key: string]: string } = {
-  Categoria_1: "https://res.cloudinary.com/cloud-drone/image/upload/v1751242471/categoria3_qwpzrm.png",
-  Categoria_2: "https://res.cloudinary.com/cloud-drone/image/upload/v1751242471/categoria2_umszpi.png",
-  Categoria_3: "https://res.cloudinary.com/cloud-drone/image/upload/v1751242471/categoria1_b2osso.png",
-
+  Categoria_1:
+    'https://res.cloudinary.com/cloud-drone/image/upload/v1751242471/categoria3_qwpzrm.png',
+  Categoria_2:
+    'https://res.cloudinary.com/cloud-drone/image/upload/v1751242471/categoria2_umszpi.png',
+  Categoria_3:
+    'https://res.cloudinary.com/cloud-drone/image/upload/v1751242471/categoria1_b2osso.png',
 };
-
 
 // -------------------------------------------------------------------------- #
 //                        COMPONENTE DA SEÇÃO DE CATEGORIAS                    #
@@ -50,9 +51,7 @@ const FeaturedCategories = ({ categories }: FeaturedCategoriesProps) => {
                 href={`/category/${category.id}`}
                 className="group block text-center"
               >
-                <div
-                  className="relative aspect-square w-full rounded-lg bg-slate-300 text-gray flex flex-col items-center justify-center p-2 transition-all duration-300 group-hover:bg-slate-500 group-hover:scale-105"
-                >
+                <div className="relative aspect-square w-full rounded-lg bg-slate-300 text-gray flex flex-col items-center justify-center p-2 transition-all duration-300 group-hover:bg-slate-500 group-hover:scale-105">
                   {/* Container para a imagem */}
                   <div className="relative w-3/4 h-3/4">
                     {imageUrl ? (

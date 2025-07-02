@@ -7,16 +7,16 @@
  */
 export interface Product {
   id: number;
-  sku: string; 
+  sku: string;
   name: string;
   image_url: string | null;
   price: number;
-  stock: number; 
+  stock: number;
   description: string | null;
   category: {
     id: number;
     title: string;
-    description?: string | null; 
+    description?: string | null;
   };
   weight_kg: number;
   height_cm: number;

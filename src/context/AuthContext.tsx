@@ -1,14 +1,26 @@
-"use client";
+/**
+ * @file Contexto de Autenticação e Estado Global do Usuário.
+ * @description Provê estado global para o usuário autenticado e seu carrinho,
+ * bem como as funções para interagir com a API de autenticação.
+ */
 
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+'use client';
+
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+  useCallback,
+} from 'react';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
-import { Product } from '@/types';
 
-// -------------------------------------------------------------------------- #
-//                                TIPOS DE DADOS                              #
-// -------------------------------------------------------------------------- #
-export type RegisterData = Record<string, any>;
+import { Product } from '@/types';
+import type { RegisterFormValues } from '@/app/register/page';
+import type { Order } from '@/app/meus-pedidos/page';
+import { api } from '@/lib/api';
 
 export interface User {
   id: number;
@@ -24,7 +36,7 @@ export interface User {
   address_zip: string;
   address_city: string;
   address_state: string;
-  orders: any[];
+  orders: Order[];
 }
 
 export interface CartItem {
@@ -33,7 +45,6 @@ export interface CartItem {
   product: Product;
 }
 
-// CORREÇÃO: Adicionando a tipagem para o cupom e incluindo-o na interface do Carrinho.
 export interface Coupon {
   id: number;
   code: string;
@@ -46,7 +57,7 @@ export interface Cart {
   subtotal: number;
   discount_amount: number;
   final_price: number;
-  coupon: Coupon | null; // <-- Propriedade adicionada!
+  coupon: Coupon | null;
 }
 
 interface AuthContextType {
@@ -58,13 +69,9 @@ interface AuthContextType {
   fetchUser: () => Promise<void>;
   login: (formData: FormData) => Promise<void>;
   logout: () => void;
-  register: (userData: RegisterData) => Promise<void>;
+  register: (userData: RegisterFormValues) => Promise<void>;
   setError: React.Dispatch<React.SetStateAction<string | null>>;
 }
-
-// -------------------------------------------------------------------------- #
-//                          CRIAÇÃO DO CONTEXTO E PROVEDOR                     #
-// -------------------------------------------------------------------------- #
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -76,52 +83,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
 
   const fetchCart = useCallback(async () => {
-    const token = Cookies.get('access_token');
-    if (!token) {
-      setCart(null);
-      return;
-    }
     try {
-      const response = await fetch('http://localhost:8000/cart/', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setCart(data);
-      } else {
-        setCart(null);
-      }
+      const data = await api.getCart();
+      setCart(data);
     } catch (e) {
-      console.error("Falha ao buscar carrinho:", e);
+      console.error('Falha ao buscar carrinho:', e);
       setCart(null);
     }
   }, []);
 
   const fetchUser = useCallback(async () => {
     const token = Cookies.get('access_token');
-    if (token) {
-      try {
-        const res = await fetch('http://localhost:8000/auth/users/me/', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (res.ok) {
-          const userData = await res.json();
-          setUser(userData);
-          if (!userData.is_superuser) {
-            await fetchCart();
-          }
-        } else {
-          Cookies.remove('access_token');
-          setUser(null);
-          setCart(null);
-        }
-      } catch (e) {
-        console.error("Falha ao buscar usuário:", e);
-        setUser(null);
-        setCart(null);
-      }
+    if (!token) {
+      setLoading(false);
+      return;
     }
-    setLoading(false);
+
+    setLoading(true);
+    try {
+      const userData = await api.getUserProfile();
+      setUser(userData);
+
+      if (!userData.is_superuser) {
+        await fetchCart();
+      }
+    } catch (err) {
+      console.error('Falha ao buscar usuário. Desconectando...', err);
+      Cookies.remove('access_token');
+      setUser(null);
+      setCart(null);
+    } finally {
+      setLoading(false);
+    }
   }, [fetchCart]);
 
   useEffect(() => {
@@ -132,42 +125,47 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('http://localhost:8000/auth/token', { method: 'POST', body: formData });
+      const response = await api.login(formData);
       const data = await response.json();
-
       if (!response.ok) throw new Error(data.detail || 'Falha no login.');
 
-      const tokenRes = await fetch('http://localhost:8000/auth/users/me/', {
-        headers: { 'Authorization': `Bearer ${data.access_token}` }
+      Cookies.set('access_token', data.access_token, {
+        expires: 1,
+        secure: process.env.NODE_ENV === 'production',
       });
-      const userData = await tokenRes.json();
 
-      Cookies.set('access_token', data.access_token, { expires: 1, secure: process.env.NODE_ENV === 'production' });
-
+      const userData = await api.getUserProfile();
       setUser(userData);
+      if (!userData.is_superuser) await fetchCart();
 
       router.push(userData.is_superuser ? '/admin/dashboard' : '/');
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Um erro inesperado ocorreu.';
+      setError(message);
     } finally {
       setLoading(false);
     }
   };
 
-  const register = async (userData: RegisterData) => {
+  const register = async (userData: RegisterFormValues) => {
     setLoading(true);
     setError(null);
     try {
-      const registerResponse = await fetch('http://localhost:8000/auth/users/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData)
-      });
+      const registerResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/auth/users/`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(userData),
+        },
+      );
 
       const registerData = await registerResponse.json();
       if (!registerResponse.ok) {
         if (registerData.detail && Array.isArray(registerData.detail)) {
-          const errorMessage = registerData.detail.map((err: any) => err.msg).join(', ');
+          const errorMessage = registerData.detail
+            .map((err: { msg: string }) => err.msg)
+            .join(', ');
           throw new Error(errorMessage);
         }
         throw new Error(registerData.detail || 'Falha ao tentar registrar.');
@@ -177,8 +175,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       loginFormData.append('username', userData.email);
       loginFormData.append('password', userData.password);
       await login(loginFormData);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Um erro inesperado ocorreu.';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -191,13 +190,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     router.push('/login');
   };
 
-  const value = { user, cart, loading, error, setError, fetchCart, fetchUser, login, logout, register };
+  const value = {
+    user,
+    cart,
+    loading,
+    error,
+    setError,
+    fetchCart,
+    fetchUser,
+    login,
+    logout,
+    register,
+  };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = (): AuthContextType => {
