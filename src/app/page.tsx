@@ -63,10 +63,6 @@ export default async function Home() {
       <FeaturedCategories categories={categories} />
 
       <div className="container mx-auto px-4 py-12">
-        <h2 className="text-2xl font-bold tracking-tight text-gray-900 mb-8 text-center sm:text-left">
-          PRODUTOS EM DESTAQUE
-        </h2>
-
         {/* 
           Se houve erro na busca, exibe uma mensagem.
           Caso contrário, renderiza a grade de produtos.
@@ -80,7 +76,11 @@ export default async function Home() {
             </p>
           </div>
         ) : (
-          <ProductGrid products={products} />
+          <ProductGrid
+            title="PRODUTOS EM DESTAQUE"
+            products={products}
+            emptyStateMessage="Nenhum produto em destaque no momento."
+          />
         )}
       </div>
     </main>

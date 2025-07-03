@@ -1,97 +1,106 @@
-// src/components/ProductViewClient.tsx - CRIAR ARQUIVO
+/**
+ * @file Componente de Cliente para Visualização de Produto.
+ * @description Renderiza a interface da página de detalhes de um produto,
+ * lidando com as interações do usuário, como adicionar o item ao carrinho.
+ * Recebe os dados do produto como prop de um Server Component pai.
+ */
 
 'use client';
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Product } from '@/types';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
-import Cookies from 'js-cookie';
 import Link from 'next/link';
-import { Loader2, ShoppingCart } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Loader2, ShoppingCart, Image as ImageIcon, Info } from 'lucide-react';
+
+import { Product } from '@/types';
+import { useAuth } from '@/context/AuthContext';
+import { api } from '@/lib/api';
 
 interface ProductViewClientProps {
   product: Product;
 }
 
 export default function ProductViewClient({ product }: ProductViewClientProps) {
-  // --- ESTADOS DO COMPONENTE ---
   const [isAdding, setIsAdding] = useState(false);
 
-  // --- HOOKS ---
-  const { user, fetchCart } = useAuth(); // fetchCart foi adicionado aqui para uso
+  const { user, fetchCart } = useAuth();
   const router = useRouter();
 
-  // --- MANIPULADOR DE EVENTOS ---
+  /**
+   * Manipula a ação de adicionar o produto ao carrinho.
+   */
   const handleAddToCart = async () => {
     if (!user) {
-      router.push('/login');
+      router.push(`/login?redirect=/product/${product.id}`);
       return;
     }
+    if (product.stock <= 0) return;
 
     setIsAdding(true);
     try {
-      const token = Cookies.get('access_token');
-      if (!token) {
-        alert('Sua sessão expirou. Por favor, faça o login novamente.');
-        router.push('/login');
-        return;
-      }
+      await api.addItemToCart(product.id, 1);
 
-      const response = await fetch('http://localhost:8000/cart/items/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ product_id: product.id, quantity: 1 }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Falha ao adicionar ao carrinho');
-      }
-      alert(`'${product.name}' foi adicionado ao carrinho!`);
-      await fetchCart(); // Chama a função do contexto para atualizar o estado do carrinho
+      alert(`"${product.name}" foi adicionado ao seu carrinho!`);
+      await fetchCart();
     } catch (error) {
+      const message = error instanceof Error ? error.message : 'Falha ao adicionar o produto.';
       console.error(error);
-      alert('Ocorreu um erro ao adicionar o produto ao carrinho.');
+      alert(`Erro: ${message}`);
     } finally {
       setIsAdding(false);
     }
   };
 
-  // O loading e o tratamento de 'not found' já aconteceram no servidor
-  // então aqui podemos renderizar o produto diretamente.
+  const isOutOfStock = product.stock <= 0;
+
   return (
     <div className="bg-white">
       <div className="container mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16">
-          <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12 lg:gap-x-16">
+          {/* Seção da Imagem do Produto */}
+          <div className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
             {product.image_url ? (
               <Image
                 src={product.image_url}
                 alt={product.name}
                 fill
-                className="object-cover object-center"
-                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-contain object-center p-4"
+                sizes="(max-width: 768px) 90vw, 45vw"
+                priority
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <span className="text-gray-400">Sem Imagem</span>
+              <div className="text-gray-400">
+                <ImageIcon size={64} strokeWidth={1} />
+                <p className="sr-only">Sem imagem disponível</p>
               </div>
             )}
           </div>
 
-          <div className="flex flex-col py-4">
-            <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-gray-900">
+          {/* Seção de Informações e Ações */}
+          <div className="flex flex-col">
+            {/* Categoria */}
+            {product.category && (
+              <Link
+                href={`/category/${product.category.id}`}
+                className="text-sm font-medium text-teal-600 hover:text-teal-800"
+              >
+                {product.category.title}
+              </Link>
+            )}
+
+            <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-gray-900 mt-2">
               {product.name}
             </h1>
 
+            {/* Preço */}
             <div className="mt-4">
               <p className="text-3xl text-gray-800">
                 R$ {product.price.toFixed(2).replace('.', ',')}
               </p>
             </div>
 
+            {/* Descrição */}
             {product.description && (
               <div className="mt-8">
                 <h3 className="text-base font-semibold text-gray-900">Descrição</h3>
@@ -101,35 +110,30 @@ export default function ProductViewClient({ product }: ProductViewClientProps) {
               </div>
             )}
 
-            {product.category && (
-              <div className="mt-8 pt-6 border-t border-gray-200">
-                <h3 className="text-base font-semibold text-gray-900">Categoria</h3>
-                <div className="mt-2">
-                  <Link
-                    href={`/category/${product.category.id}`}
-                    className="text-base text-teal-600 hover:text-teal-800 font-semibold"
-                  >
-                    {product.category.title}
-                  </Link>
-                  {product.category.description && (
-                    <p className="mt-1 text-sm text-gray-500">{product.category.description}</p>
-                  )}
+            <div className="mt-10 pt-6 border-t">
+              {isOutOfStock && (
+                <div className="mb-4 flex items-center gap-2 text-yellow-700 bg-yellow-50 p-3 rounded-md">
+                  <Info size={20} />
+                  <p className="text-sm font-semibold">
+                    Este produto está indisponível no momento.
+                  </p>
                 </div>
-              </div>
-            )}
-
-            <div className="mt-10">
+              )}
               <button
                 onClick={handleAddToCart}
-                disabled={isAdding}
-                className="flex w-full max-w-xs items-center justify-center rounded-md border border-transparent bg-black px-8 py-3 text-base font-medium text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:bg-gray-400"
+                disabled={isAdding || isOutOfStock}
+                className="flex w-full max-w-xs items-center justify-center rounded-md border border-transparent bg-black px-8 py-3 text-base font-medium text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
                 {isAdding ? (
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                 ) : (
                   <ShoppingCart className="mr-2 h-5 w-5" />
                 )}
-                {isAdding ? 'Adicionando...' : 'Adicionar ao Carrinho'}
+                {isOutOfStock
+                  ? 'Indisponível'
+                  : isAdding
+                    ? 'Adicionando...'
+                    : 'Adicionar ao Carrinho'}
               </button>
             </div>
           </div>
