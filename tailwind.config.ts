@@ -1,43 +1,54 @@
-import type { Config } from "tailwindcss"
+/**
+ * @file Arquivo de configuração do Tailwind CSS.
+ * @description Define as customizações de tema, plugins e configurações de conteúdo
+ * para o framework de CSS utility-first Tailwind.
+ */
+
+import type { Config } from 'tailwindcss';
+
+import tailwindcssAnimate from 'tailwindcss-animate';
+import tailwindcssAspectRatio from '@tailwindcss/aspect-ratio';
+import tailwindcssTypography from '@tailwindcss/typography';
 
 const config = {
-  darkMode: "class",
+  darkMode: 'class',
   content: [
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
-	],
-  prefix: "",
+  ],
+  prefix: '',
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: '2rem',
       screens: {
-        "2xl": "1400px",
+        '2xl': '1400px',
       },
     },
     extend: {
       keyframes: {
-        "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
+        'accordion-down': {
+          from: { height: '0' },
+          to: { height: 'var(--radix-accordion-content-height)' },
         },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
+        'accordion-up': {
+          from: { height: 'var(--radix-accordion-content-height)' },
+          to: { height: '0' },
         },
       },
       animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
+        'accordion-down': 'accordion-down 0.2s ease-out',
+        'accordion-up': 'accordion-up 0.2s ease-out',
       },
     },
   },
   plugins: [
-    require("tailwindcss-animate"),
-    require('@tailwindcss/aspect-ratio'), // O plugin que precisamos para a imagem do produto
+    tailwindcssAnimate,
+    tailwindcssAspectRatio,
+    tailwindcssTypography,
   ],
-} satisfies Config
+} satisfies Config;
 
-export default config
+export default config;
