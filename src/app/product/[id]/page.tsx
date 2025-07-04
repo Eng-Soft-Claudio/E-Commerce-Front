@@ -15,9 +15,6 @@ import ProductViewClient from '@/components/ProductViewClient';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-type PageProps = {
-  params: { id: string };
-};
 
 /**
  * Busca os dados de um único produto no servidor.
@@ -64,7 +61,7 @@ export async function generateMetadata(
   };
 }
 
-export default async function ProductDetailPage({ params }: PageProps) {
+export default async function ProductDetailPage({ params }: {params: { id: string }}) {
   const product = await getProduct(params.id);
 
   if (!product) {
