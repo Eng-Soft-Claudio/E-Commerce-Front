@@ -6,15 +6,16 @@
 
 import React from 'react';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 
 import ProductGrid from '@/components/ProductGrid';
 import { Product } from '@/types';
 import { PackageSearch } from 'lucide-react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
 type Props = {
   params: { id: string };
-  searchParams: { [key: string]: string | string[] | undefined };
 };
 interface Category {
   id: number;
@@ -51,7 +52,9 @@ async function getProductsByCategory(categoryId: string): Promise<Product[]> {
   }
 }
 
-export async function generateMetadata({ params }: Props) {
+export async function generateMetadata(
+  { params }: Props,
+): Promise<Metadata> {
   const category = await getCategoryDetails(params.id);
   if (!category) {
     return { title: 'Categoria não encontrada' };
