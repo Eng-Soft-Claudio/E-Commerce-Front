@@ -19,12 +19,6 @@ interface Category {
   description?: string | null;
 }
 
-interface CategoryPageProps {
-  params: {
-    id: string;
-  };
-}
-
 async function getCategoryDetails(categoryId: string): Promise<Category | null> {
   try {
     const res = await fetch(`${API_URL}/categories/${categoryId}`, {
@@ -54,7 +48,7 @@ async function getProductsByCategory(categoryId: string): Promise<Product[]> {
   }
 }
 
-export async function generateMetadata({ params }: CategoryPageProps) {
+export async function generateMetadata({ params }:  { params: { id: string } }){
   const category = await getCategoryDetails(params.id);
   if (!category) {
     return { title: 'Categoria não encontrada' };
@@ -66,7 +60,7 @@ export async function generateMetadata({ params }: CategoryPageProps) {
   };
 }
 
-export default async function CategoryPage({ params }: CategoryPageProps) {
+export default async function CategoryPage({ params }:  { params: { id: string } }) {
   const [category, products] = await Promise.all([
     getCategoryDetails(params.id),
     getProductsByCategory(params.id),
