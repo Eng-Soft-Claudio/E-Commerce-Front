@@ -88,12 +88,19 @@ function SearchLoading() {
   );
 }
 
+type SearchPageProps = {
+  searchParams: Promise<{
+    q?: string;
+  }>;
+};
+
 /**
  * O componente de página exportado, que orquestra a renderização.
  * Ele extrai a query da URL e usa Suspense para gerenciar o estado de carregamento.
  */
-export default function SearchPage({ searchParams }: { searchParams: { q?: string } }) {
-  const query = searchParams.q || '';
+export default async function SearchPage({ searchParams }: SearchPageProps) {
+  const params = await searchParams;
+  const query = params.q || '';
 
   return (
     <Suspense key={query} fallback={<SearchLoading />}>
