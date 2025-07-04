@@ -49,7 +49,7 @@ async function getProduct(productId: string): Promise<Product | null> {
  * otimizando a página para mecanismos de busca (SEO).
  */
 export async function generateMetadata(
-  { params }: Props,
+  { params }: { params: { id: string } }
 ): Promise<Metadata> {
   const product = await getProduct(params.id);
 

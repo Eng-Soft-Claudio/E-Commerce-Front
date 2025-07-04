@@ -17,6 +17,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 type Props = {
   params: { id: string };
 };
+
 interface Category {
   id: number;
   title: string;
@@ -53,7 +54,7 @@ async function getProductsByCategory(categoryId: string): Promise<Product[]> {
 }
 
 export async function generateMetadata(
-  { params }: Props,
+  { params }: { params: { id: string } },
 ): Promise<Metadata> {
   const category = await getCategoryDetails(params.id);
   if (!category) {
