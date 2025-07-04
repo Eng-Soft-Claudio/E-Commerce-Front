@@ -51,15 +51,16 @@ async function getProductsByCategory(categoryId: string): Promise<Product[]> {
 }
 
 type CategoryPageProps = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 export async function generateMetadata(
   { params }: CategoryPageProps,
 ): Promise<Metadata> {
-  const category = await getCategoryDetails(params.id);
+  const { id } = await params;
+  const category = await getCategoryDetails(id);
   if (!category) {
     return { title: 'Categoria não encontrada' };
   }
@@ -71,9 +72,10 @@ export async function generateMetadata(
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
+  const { id } = await params;
   const [category, products] = await Promise.all([
-    getCategoryDetails(params.id),
-    getProductsByCategory(params.id),
+    getCategoryDetails(id),
+    getProductsByCategory(id),
   ]);
 
   if (!category) {

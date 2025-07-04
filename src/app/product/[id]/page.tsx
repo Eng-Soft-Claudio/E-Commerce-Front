@@ -41,9 +41,9 @@ async function getProduct(productId: string): Promise<Product | null> {
 }
 
 type ProductPageProps = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 /**
@@ -53,7 +53,8 @@ type ProductPageProps = {
 export async function generateMetadata(
   { params }: ProductPageProps
 ): Promise<Metadata> {
-  const product = await getProduct(params.id);
+  const { id } = await params;
+  const product = await getProduct(id);
 
   if (!product) {
     return {
@@ -67,7 +68,8 @@ export async function generateMetadata(
 }
 
 export default async function ProductDetailPage({ params }: ProductPageProps) {
-  const product = await getProduct(params.id);
+  const { id } = await params;
+  const product = await getProduct(id);
 
   if (!product) {
     notFound();
