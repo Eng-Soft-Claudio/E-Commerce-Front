@@ -13,12 +13,6 @@ import { Product } from '@/types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-interface SearchPageProps {
-  searchParams: {
-    q?: string;
-  };
-}
-
 /**
  * Busca produtos na API com base em uma query, executado no servidor.
  * @param query - O termo de busca.
@@ -98,7 +92,7 @@ function SearchLoading() {
  * O componente de página exportado, que orquestra a renderização.
  * Ele extrai a query da URL e usa Suspense para gerenciar o estado de carregamento.
  */
-export default function SearchPage({ searchParams }: SearchPageProps) {
+export default function SearchPage({ searchParams }: { searchParams: { q?: string } }) {
   const query = searchParams.q || '';
 
   return (
