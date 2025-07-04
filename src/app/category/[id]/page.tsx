@@ -12,7 +12,10 @@ import { Product } from '@/types';
 import { PackageSearch } from 'lucide-react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-
+type Props = {
+  params: { id: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+};
 interface Category {
   id: number;
   title: string;
@@ -48,7 +51,7 @@ async function getProductsByCategory(categoryId: string): Promise<Product[]> {
   }
 }
 
-export async function generateMetadata({ params }:  { params: { id: string } }){
+export async function generateMetadata({ params }: Props) {
   const category = await getCategoryDetails(params.id);
   if (!category) {
     return { title: 'Categoria não encontrada' };
@@ -60,7 +63,7 @@ export async function generateMetadata({ params }:  { params: { id: string } }){
   };
 }
 
-export default async function CategoryPage({ params }:  { params: { id: string } }) {
+export default async function CategoryPage({ params }: Props) {
   const [category, products] = await Promise.all([
     getCategoryDetails(params.id),
     getProductsByCategory(params.id),

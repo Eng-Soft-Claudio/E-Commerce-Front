@@ -14,7 +14,10 @@ import ProductViewClient from '@/components/ProductViewClient';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-
+type Props = {
+  params: { id: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+};
 
 /**
  * Busca os dados de um único produto no servidor.
@@ -45,7 +48,7 @@ async function getProduct(productId: string): Promise<Product | null> {
  * Gera metadados dinâmicos (título e descrição) para a página do produto,
  * otimizando a página para mecanismos de busca (SEO).
  */
-export async function generateMetadata({ params }:  { params: { id: string } }) {
+export async function generateMetadata({ params }:  Props) {
   const product = await getProduct(params.id);
 
   if (!product) {
@@ -59,7 +62,7 @@ export async function generateMetadata({ params }:  { params: { id: string } }) 
   };
 }
 
-export default async function ProductDetailPage({ params }:  { params: { id: string } }) {
+export default async function ProductDetailPage({ params }:  Props) {
   const product = await getProduct(params.id);
 
   if (!product) {
