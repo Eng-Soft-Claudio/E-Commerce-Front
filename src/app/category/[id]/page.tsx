@@ -50,8 +50,14 @@ async function getProductsByCategory(categoryId: string): Promise<Product[]> {
   }
 }
 
+type CategoryPageProps = {
+  params: {
+    id: string;
+  };
+};
+
 export async function generateMetadata(
-  { params }: { params: { id: string } },
+  { params }: CategoryPageProps,
 ): Promise<Metadata> {
   const category = await getCategoryDetails(params.id);
   if (!category) {
@@ -64,7 +70,7 @@ export async function generateMetadata(
   };
 }
 
-export default async function CategoryPage({ params }:{params: { id: string }}) {
+export default async function CategoryPage({ params }: CategoryPageProps) {
   const [category, products] = await Promise.all([
     getCategoryDetails(params.id),
     getProductsByCategory(params.id),
