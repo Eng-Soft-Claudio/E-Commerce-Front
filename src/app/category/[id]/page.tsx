@@ -14,7 +14,7 @@ import { PackageSearch } from 'lucide-react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-type Props = {
+type CategoryPageProps = {
   params: { id: string };
 };
 
@@ -67,7 +67,7 @@ export async function generateMetadata(
   };
 }
 
-export default async function CategoryPage({ params }: Props) {
+export default async function CategoryPage({ params }: CategoryPageProps) {
   const [category, products] = await Promise.all([
     getCategoryDetails(params.id),
     getProductsByCategory(params.id),

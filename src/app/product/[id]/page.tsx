@@ -15,7 +15,7 @@ import ProductViewClient from '@/components/ProductViewClient';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-type Props = {
+type ProductPageProps = {
   params: { id: string };
 };
 
@@ -64,7 +64,7 @@ export async function generateMetadata(
   };
 }
 
-export default async function ProductDetailPage({ params }: Props) {
+export default async function ProductDetailPage({ params }: ProductPageProps) {
   const product = await getProduct(params.id);
 
   if (!product) {
