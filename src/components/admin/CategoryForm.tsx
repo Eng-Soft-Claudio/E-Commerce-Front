@@ -29,6 +29,7 @@ import {
 const formSchema = z.object({
   title: z.string().min(2, { message: 'O título deve ter pelo menos 2 caracteres.' }),
   description: z.string().optional().nullable(),
+  image_url: z.string().url({ message: 'URL da imagem inválida.' }).optional().or(z.literal('')),
 });
 
 export type CategoryFormValues = z.infer<typeof formSchema>;
@@ -46,7 +47,11 @@ interface CategoryFormProps {
 export const CategoryForm = ({ onSubmit, initialData, isLoading }: CategoryFormProps) => {
   const form = useForm<CategoryFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData || { title: '', description: '' },
+    defaultValues: {
+      title: initialData?.title || '',
+      description: initialData?.description || '',
+      image_url: initialData?.image_url || '',
+    },
   });
 
   /**
@@ -55,7 +60,11 @@ export const CategoryForm = ({ onSubmit, initialData, isLoading }: CategoryFormP
    * abrir o de outro, os campos serão atualizados corretamente.
    */
   useEffect(() => {
-    form.reset(initialData || { title: '', description: '' });
+    form.reset({
+      title: initialData?.title || '',
+      description: initialData?.description || '',
+      image_url: initialData?.image_url || '',
+    });
   }, [initialData, form]);
 
   return (
@@ -70,7 +79,7 @@ export const CategoryForm = ({ onSubmit, initialData, isLoading }: CategoryFormP
                 <FormLabel>Título da Categoria</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Ex: Terços, Imagens, Livros"
+                    placeholder="Título da categoria"
                     {...field}
                     value={field.value || ''}
                   />
@@ -88,6 +97,23 @@ export const CategoryForm = ({ onSubmit, initialData, isLoading }: CategoryFormP
                 <FormControl>
                   <Input
                     placeholder="Uma breve descrição sobre a categoria"
+                    {...field}
+                    value={field.value || ''}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="image_url"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>URL da Imagem</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Cole a URL da imagem aqui"
                     {...field}
                     value={field.value || ''}
                   />

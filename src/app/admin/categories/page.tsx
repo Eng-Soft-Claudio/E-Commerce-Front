@@ -37,6 +37,7 @@ interface Category {
   id: number;
   title: string;
   description?: string | null;
+  image_url?: string;
 }
 
 /**
@@ -175,7 +176,15 @@ const AdminCategoriesPage = () => {
             </DialogHeader>
             <CategoryForm
               onSubmit={handleFormSubmit}
-              initialData={editingCategory || undefined}
+              initialData={
+                editingCategory
+                  ? {
+                      title: editingCategory.title,
+                      description: editingCategory.description,
+                      image_url: editingCategory.image_url || undefined,
+                    }
+                  : undefined
+              }
               isLoading={isSubmitting}
             />
           </DialogContent>
@@ -188,7 +197,7 @@ const AdminCategoriesPage = () => {
             <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
             <p className="ml-3 text-gray-600">Carregando categorias...</p>
           </div>
-        ) : error ? ( // Exibe o erro na UI
+        ) : error ? ( 
           <div className="text-center py-10 text-red-600">
             <p>
               <strong>Erro ao carregar dados:</strong> {error}
