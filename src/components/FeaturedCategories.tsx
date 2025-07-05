@@ -16,27 +16,12 @@ import { ImageIcon } from 'lucide-react'; // Ícone para placeholder
 interface Category {
   id: number;
   title: string;
+  image_url?: string | null;
 }
 
 interface FeaturedCategoriesProps {
   categories: Category[];
 }
-
-/**
- * Mapeia um slug de categoria para a URL de sua imagem correspondente.
- * Usar `Record<string, string>` é mais explícito e seguro do que um objeto genérico.
- */
-const imageUrlMap: Record<string, string> = {
-  'categoria_1':
-    'https://res.cloudinary.com/cloud-drone/image/upload/v1751242471/categoria3_qwpzrm.png',
-  'categoria_2':
-    'https://res.cloudinary.com/cloud-drone/image/upload/v1751242471/categoria2_umszpi.png',
-  'categoria_3':
-    'https://res.cloudinary.com/cloud-drone/image/upload/v1751242471/categoria1_b2osso.png',
-    'categoria_4':
-    'https://res.cloudinary.com/cloud-drone/image/upload/v1751242471/categoria3_qwpzrm.png',
-};
-
 
 const FeaturedCategories = ({ categories }: FeaturedCategoriesProps) => {
   if (!categories || categories.length === 0) return null;
@@ -53,8 +38,7 @@ const FeaturedCategories = ({ categories }: FeaturedCategoriesProps) => {
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 md:gap-6">
           {categories.map((category) => {
-            const imageKey = category.title.toLowerCase();
-            const imageUrl = imageUrlMap[imageKey];
+            const imageUrl = category.image_url;
 
             return (
               <Link
