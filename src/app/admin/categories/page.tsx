@@ -84,8 +84,6 @@ const AdminCategoriesPage = () => {
    */
   const handleFormSubmit = async (values: CategoryFormValues) => {
 
-    console.log("DADOS QUE O FORMULÁRIO ESTÁ ENVIANDO:", values);
-
     setIsSubmitting(true);
     const token = Cookies.get('access_token');
     const method = editingCategory ? 'PUT' : 'POST';
