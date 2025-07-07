@@ -6,13 +6,14 @@
 
 'use client';
 
-import React, { ReactNode, useEffect } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { LayoutDashboard, Box, ShoppingBag, Users, FolderKanban, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import AdminNavbar from './AdminNavbar';
+import AdminMobileMenu from './AdminMobileMenu';
 
 interface NavItemProps {
   href: string;
@@ -49,7 +50,7 @@ interface AdminLayoutProps {
 const AdminLayout = ({ children }: AdminLayoutProps) => {
   const { user, loading } = useAuth();
   const router = useRouter();
-
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   useEffect(() => {
     if (!loading) {
       if (!user || !user.is_superuser) {
@@ -69,6 +70,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
+      <AdminMobileMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
       <aside className="w-64 bg-gray-800 text-white flex-shrink-0 hidden md:flex md:flex-col">
         <div className="p-5 text-2xl font-bold border-b border-gray-700 flex-shrink-0">
           <Link href="/admin/dashboard">Admin Panel</Link>
@@ -93,7 +95,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       </aside>
 
       <div className="flex-grow flex flex-col">
-        <AdminNavbar />
+        <AdminNavbar onMenuClick={() => setIsMenuOpen(true)} />
         <main className="flex-grow p-6 md:p-8">{children}</main>
       </div>
     </div>
