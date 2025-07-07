@@ -8,7 +8,14 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Menu, ShoppingCart, User as UserIcon, LogOut, Search } from 'lucide-react';
+import {
+  Menu,
+  ShoppingCart,
+  User as UserIcon,
+  LogOut,
+  Search,
+  LayoutDashboard,
+} from 'lucide-react';
 
 import MobileMenu from './MobileMenu';
 import { useAuth } from '@/context/AuthContext';
@@ -76,9 +83,18 @@ const Header = () => {
               </form>
             </div>
 
-            <div className="flex items-center space-x-4 shrink-0">
+            <div className="flex items-center space-x-2 md:space-x-4 shrink-0">
               {user ? (
                 <>
+                  {user.is_superuser && (
+                    <Link
+                      href="/admin/dashboard"
+                      className="md:hidden p-2 hover:bg-gray-100 rounded-full"
+                      aria-label="Painel Admin"
+                    >
+                      <LayoutDashboard className="h-5 w-5" />
+                    </Link>
+                  )}
                   <Link
                     href={user.is_superuser ? '/admin/dashboard' : '/minha-conta'}
                     className="hidden md:flex items-center space-x-2 hover:text-red-500"

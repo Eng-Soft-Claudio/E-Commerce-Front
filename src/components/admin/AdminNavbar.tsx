@@ -7,8 +7,8 @@
 'use client';
 
 import React from 'react';
-import { LogOut, Menu } from 'lucide-react';
-
+import { LogOut, Menu, Store } from 'lucide-react';
+import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 
@@ -34,10 +34,15 @@ const AdminNavbar = ({ onMenuClick }: AdminNavbarProps) => {
   }
 
   return (
-    <header className="bg-white shadow-md p-4 flex justify-between items-center">
+    <header className="bg-white shadow-md p-4 flex justify-between items-center sticky top-0 z-20">
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" className="md:hidden" onClick={onMenuClick}>
           <Menu className="h-6 w-6" />
+        </Button>
+        <Button asChild variant="ghost" size="icon" aria-label="Ir para a loja">
+          <Link href="/">
+            <Store className="h-6 w-6" />
+          </Link>
         </Button>
       </div>
       <div className="flex items-center gap-4">
