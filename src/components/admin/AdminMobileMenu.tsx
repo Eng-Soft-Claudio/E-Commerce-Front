@@ -5,7 +5,16 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { X, LayoutDashboard, Box, ShoppingBag, Users, FolderKanban, LogOut } from 'lucide-react';
+import {
+  X,
+  LayoutDashboard,
+  Box,
+  ShoppingBag,
+  Users,
+  FolderKanban,
+  LogOut,
+  GalleryHorizontal, 
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
@@ -26,12 +35,12 @@ const AdminMobileMenu = ({ isOpen, onClose }: AdminMobileMenuProps) => {
   const handleLogoutClick = () => {
     logout();
     onClose();
-  }
+  };
 
   return (
     <div
       className={cn(
-        'fixed inset-0 z-40 lg:hidden transition-opacity duration-300', // lg:hidden garante que só apareça em telas menores que 'large'
+        'fixed inset-0 z-40 lg:hidden transition-opacity duration-300', 
         isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none',
       )}
       role="dialog"
@@ -39,7 +48,7 @@ const AdminMobileMenu = ({ isOpen, onClose }: AdminMobileMenuProps) => {
     >
       {/* Overlay escuro */}
       <div className="absolute inset-0 bg-black/50" onClick={onClose} aria-hidden="true" />
-      
+
       {/* Conteúdo do Menu */}
       <div
         className={cn(
@@ -51,16 +60,33 @@ const AdminMobileMenu = ({ isOpen, onClose }: AdminMobileMenuProps) => {
         <div className="flex flex-col h-full">
           <div className="p-5 flex justify-between items-center border-b border-gray-700">
             <h2 className="text-xl font-bold">Admin Panel</h2>
-            <button onClick={onClose} className="p-1 text-gray-400 hover:text-white" aria-label="Fechar menu">
+            <button
+              onClick={onClose}
+              className="p-1 text-gray-400 hover:text-white"
+              aria-label="Fechar menu"
+            >
               <X size={24} />
             </button>
           </div>
           <nav className="p-4 space-y-2 flex-grow">
-            <NavItem onClick={() => handleLinkClick('/admin/dashboard')} icon={LayoutDashboard}>Dashboard</NavItem>
-            <NavItem onClick={() => handleLinkClick('/admin/categories')} icon={FolderKanban}>Categorias</NavItem>
-            <NavItem onClick={() => handleLinkClick('/admin/products')} icon={Box}>Produtos</NavItem>
-            <NavItem onClick={() => handleLinkClick('/admin/orders')} icon={ShoppingBag}>Pedidos</NavItem>
-            <NavItem onClick={() => handleLinkClick('/admin/users')} icon={Users}>Usuários</NavItem>
+            <NavItem onClick={() => handleLinkClick('/admin/dashboard')} icon={LayoutDashboard}>
+              Dashboard
+            </NavItem>
+            <NavItem onClick={() => handleLinkClick('/admin/banners')} icon={GalleryHorizontal}>
+              Banners
+            </NavItem>
+            <NavItem onClick={() => handleLinkClick('/admin/categories')} icon={FolderKanban}>
+              Categorias
+            </NavItem>
+            <NavItem onClick={() => handleLinkClick('/admin/products')} icon={Box}>
+              Produtos
+            </NavItem>
+            <NavItem onClick={() => handleLinkClick('/admin/orders')} icon={ShoppingBag}>
+              Pedidos
+            </NavItem>
+            <NavItem onClick={() => handleLinkClick('/admin/users')} icon={Users}>
+              Usuários
+            </NavItem>
           </nav>
           <div className="p-4 border-t border-gray-700">
             <Button variant="destructive" className="w-full" onClick={handleLogoutClick}>
@@ -74,13 +100,24 @@ const AdminMobileMenu = ({ isOpen, onClose }: AdminMobileMenuProps) => {
   );
 };
 
-const NavItem = ({ onClick, icon: Icon, children }: { onClick: () => void, icon: React.ElementType, children: React.ReactNode }) => {
-    return (
-        <button onClick={onClick} className='w-full flex items-center px-4 py-2.5 rounded-lg text-gray-300 hover:bg-gray-700/50 hover:text-white text-left transition-colors'>
-             <Icon className="mr-3 h-5 w-5" />
-            {children}
-        </button>
-    )
-}
+const NavItem = ({
+  onClick,
+  icon: Icon,
+  children,
+}: {
+  onClick: () => void;
+  icon: React.ElementType;
+  children: React.ReactNode;
+}) => {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full flex items-center px-4 py-2.5 rounded-lg text-gray-300 hover:bg-gray-700/50 hover:text-white text-left transition-colors"
+    >
+      <Icon className="mr-3 h-5 w-5" />
+      {children}
+    </button>
+  );
+};
 
 export default AdminMobileMenu;

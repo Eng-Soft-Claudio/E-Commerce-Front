@@ -1,6 +1,18 @@
 // src/types/index.ts
 
 /**
+ * Interface que representa a estrutura de um Banner.
+ */
+export interface Banner {
+  id: number;
+  title: string;
+  image_url: string;
+  link_url: string | null;
+  position: number;
+  is_active: boolean;
+}
+
+/**
  * Interface que representa a estrutura de um Produto como recebido da API.
  * Inclui dados básicos, categoria associada, e informações de logística
  * para cálculo de frete.

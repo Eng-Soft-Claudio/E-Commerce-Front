@@ -10,7 +10,15 @@ import React, { ReactNode, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { LayoutDashboard, Box, ShoppingBag, Users, FolderKanban, Loader2 } from 'lucide-react';
+import {
+  LayoutDashboard,
+  Box,
+  ShoppingBag,
+  Users,
+  FolderKanban,
+  Loader2,
+  GalleryHorizontal,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import AdminNavbar from './AdminNavbar';
 import AdminMobileMenu from './AdminMobileMenu';
@@ -78,6 +86,9 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
         <nav className="p-4 space-y-2 flex-grow">
           <AdminNavItem href="/admin/dashboard" icon={LayoutDashboard}>
             Dashboard
+          </AdminNavItem>
+          <AdminNavItem href="/admin/banners" icon={GalleryHorizontal}>
+            Banners
           </AdminNavItem>
           <AdminNavItem href="/admin/categories" icon={FolderKanban}>
             Categorias

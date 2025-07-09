@@ -7,6 +7,8 @@
 import Cookies from 'js-cookie';
 import { ProfileFormValues } from '@/components/user/UserProfileForm';
 import { PasswordFormValues } from '@/components/user/ChangePasswordForm';
+import { Banner } from '@/types';
+import { BannerFormValues } from '@/components/admin/BannerForm';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -34,12 +36,23 @@ async function apiFetch(endpoint: string, options: FetchOptions = {}) {
       return { success: true };
     }
 
+    if (!response.headers.get('content-type')?.includes('application/json')) {
+      if (!response.ok) {
+        throw new Error(`Erro de rede ou servidor: ${response.status} ${response.statusText}`);
+      }
+      return response.text();
+    }
+
     const data = await response.json().catch(() => {
       throw new Error(`Resposta inválida do servidor com status: ${response.status}`);
     });
 
     if (!response.ok) {
-      throw new Error(data.detail || `Erro na API: ${response.statusText}`);
+      const detail = data?.detail;
+      if (Array.isArray(detail)) {
+        throw new Error(detail.map((err) => `${err.loc.join('.')}: ${err.msg}`).join('; '));
+      }
+      throw new Error(detail || `Erro na API: ${response.statusText}`);
     }
 
     return data;
@@ -69,6 +82,25 @@ export const api = {
       body: JSON.stringify(data),
       requiresAuth: true,
     }),
+  getAllBanners: (): Promise<Banner[]> => apiFetch('/banners/', { requiresAuth: true }),
+  createBanner: (bannerData: BannerFormValues): Promise<Banner> =>
+    apiFetch('/banners/', {
+      method: 'POST',
+      body: JSON.stringify(bannerData),
+      requiresAuth: true,
+    }),
+  updateBanner: (bannerId: number, bannerData: BannerFormValues): Promise<Banner> =>
+    apiFetch(`/banners/${bannerId}`, {
+      method: 'PUT',
+      body: JSON.stringify(bannerData),
+      requiresAuth: true,
+    }),
+  deleteBanner: (bannerId: number): Promise<{ message: string }> =>
+    apiFetch(`/banners/${bannerId}`, {
+      method: 'DELETE',
+      requiresAuth: true,
+    }),
+  getActiveBanners: (): Promise<Banner[]> => apiFetch('/banners/active/', { requiresAuth: false }),
   getCart: () => apiFetch('/cart/', { requiresAuth: true }),
   addItemToCart: (productId: number, quantity: number) =>
     apiFetch('/cart/items/', {
