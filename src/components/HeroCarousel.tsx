@@ -18,7 +18,7 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
-import { Banner } from '@/types'; 
+import { Banner } from '@/types';
 
 /**
  * Propriedades para o componente HeroCarousel.
@@ -51,15 +51,15 @@ const HeroCarousel = ({ banners }: HeroCarouselProps) => {
         <CarouselContent>
           {banners.map((banner, index) => (
             <CarouselItem key={banner.id}>
-              <div className="relative w-full h-[250px] md:h-[400px] lg:h-[500px] xl:h-[550px]">
+              <div className="relative w-full h-[250px] md:h-[400px] lg:h-[500px] xl:h-[550px] bg-black">
                 {banner.link_url ? (
                   <Link href={banner.link_url} passHref>
                     <Image
                       src={banner.image_url}
                       alt={banner.title}
                       fill
-                      style={{ objectFit: 'cover' }}
-                      priority={index === 0} 
+                      style={{ objectFit: 'contain' }}
+                      priority={index === 0}
                       sizes="100vw"
                     />
                   </Link>
@@ -68,7 +68,7 @@ const HeroCarousel = ({ banners }: HeroCarouselProps) => {
                     src={banner.image_url}
                     alt={banner.title}
                     fill
-                    style={{ objectFit: 'cover' }}
+                    style={{ objectFit: 'contain' }}
                     priority={index === 0}
                     sizes="100vw"
                   />
